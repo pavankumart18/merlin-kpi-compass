@@ -33,35 +33,27 @@
   <!-- ENTITY SELECTOR -->
   <div class="school-bar">
     <span class="school-label">Scope -&gt;</span>
-    <div class="school-tabs" id="schoolTabs">
-      <button class="school-tab active" data-entity="global-hq">
-        <div class="school-dot global"></div>
-        Corporate HQ
-      </button>
-      <button class="school-tab" data-entity="region-1">
-        <div class="school-dot regional"></div>
-        Region 1
-      </button>
-      <button class="school-tab" data-entity="region-2">
-        <div class="school-dot regional"></div>
-        Region 2
-      </button>
-      <button class="school-tab" data-entity="region-3">
-        <div class="school-dot regional"></div>
-        Region 3
-      </button>
-      <button class="school-tab" data-entity="park-1">
-        <div class="school-dot local"></div>
-        Theme Park 1
-      </button>
-      <button class="school-tab" data-entity="park-2">
-        <div class="school-dot local"></div>
-        Theme Park 2
-      </button>
-      <button class="school-tab" data-entity="park-3">
-        <div class="school-dot local"></div>
-        Theme Park 3
-      </button>
+    <div class="scope-shell">
+      <div class="school-tabs" id="primaryTabs">
+        <button class="school-tab active" data-entity="global-hq">
+          <div class="school-dot global"></div>
+          Corporate HQ
+        </button>
+        <button class="school-tab" data-entity="region-1">
+          <div class="school-dot regional"></div>
+          Region 1
+        </button>
+        <button class="school-tab" data-entity="region-2">
+          <div class="school-dot regional"></div>
+          Region 2
+        </button>
+        <button class="school-tab" data-entity="region-3">
+          <div class="school-dot regional"></div>
+          Region 3
+        </button>
+      </div>
+      <div class="scope-context" id="contextTabs"></div>
+      <div class="scope-path" id="scopePath"></div>
     </div>
   </div>
 
@@ -109,10 +101,17 @@
     <button class="filter-chip" data-filter="on-track">On Target</button>
     <button class="filter-chip" data-filter="at-risk">At Risk</button>
     <button class="filter-chip" data-filter="off-track">Off Target</button>
-    <div class="filter-sep"></div>
-    <button class="filter-chip" data-scope="global">Global</button>
-    <button class="filter-chip" data-scope="regional">Regional</button>
-    <button class="filter-chip" data-scope="local">Local</button>
+  </div>
+
+  <!-- CONTRIBUTION FLOW -->
+  <div class="hierarchy-wrap">
+    <div class="hierarchy-card">
+      <div class="hierarchy-head">
+        <div class="hierarchy-title" id="hierarchyTitle">Contribution Flow</div>
+        <div class="hierarchy-subtitle" id="hierarchySubtitle"></div>
+      </div>
+      <div class="hierarchy-grid" id="hierarchyGrid"></div>
+    </div>
   </div>
 
   <!-- MAIN TABLE -->

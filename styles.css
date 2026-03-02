@@ -142,9 +142,16 @@ body::before {
   z-index: 1;
   padding: 20px 32px 0;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
-  flex-wrap: wrap;
+}
+
+.scope-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
 }
 
 .school-label {
@@ -160,6 +167,36 @@ body::before {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.scope-context {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.context-label {
+  font-size: 10px;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.context-list {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.context-tab {
+  border-style: dashed;
+}
+
+.scope-path {
+  font-size: 11px;
+  color: var(--text2);
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .school-tab {
@@ -334,6 +371,107 @@ body::before {
   height: 22px;
   background: var(--border);
   margin: 0 6px;
+}
+
+/* ---- CONTRIBUTION FLOW ---- */
+.hierarchy-wrap {
+  position: relative;
+  z-index: 1;
+  padding: 0 32px 18px;
+}
+
+.hierarchy-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px 18px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
+}
+
+.hierarchy-head {
+  margin-bottom: 12px;
+}
+
+.hierarchy-title {
+  font-family: 'Fraunces', serif;
+  font-size: 19px;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.hierarchy-subtitle {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 4px;
+}
+
+.hierarchy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
+}
+
+.flow-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.flow-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: start;
+}
+
+.flow-unit {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.flow-tag {
+  font-size: 10px;
+  color: var(--accent);
+  border: 1px solid rgba(15, 118, 110, 0.2);
+  background: rgba(15, 118, 110, 0.08);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: 'JetBrains Mono', monospace;
+  white-space: nowrap;
+}
+
+.flow-metrics {
+  display: grid;
+  gap: 4px;
+  margin-top: 10px;
+}
+
+.flow-metric {
+  font-size: 11px;
+  color: var(--text2);
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.flow-metric strong {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text);
+}
+
+.flow-lift {
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--accent2);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.flow-empty {
+  font-size: 12px;
+  color: var(--text3);
+  padding: 8px 0;
 }
 
 /* ---- MAIN TABLE AREA ---- */
@@ -962,6 +1100,7 @@ body::before {
   .school-bar,
   .summary-strip,
   .filter-bar,
+  .hierarchy-wrap,
   .main {
     padding-left: 16px;
     padding-right: 16px;
@@ -969,5 +1108,9 @@ body::before {
 
   .stat-card {
     min-width: calc(50% - 12px);
+  }
+
+  .scope-shell {
+    width: 100%;
   }
 }

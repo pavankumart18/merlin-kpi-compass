@@ -6,13 +6,38 @@
 // ---- Entities ----
 const ENTITIES = [
   { id: 'global-hq', name: 'Corporate HQ', level: 'global', factor: 1.0, variance: 0.015 },
-  { id: 'region-1', name: 'Region 1', level: 'regional', factor: 1.02, variance: 0.035 },
-  { id: 'region-2', name: 'Region 2', level: 'regional', factor: 0.98, variance: 0.04 },
-  { id: 'region-3', name: 'Region 3', level: 'regional', factor: 1.01, variance: 0.03 },
-  { id: 'park-1', name: 'Theme Park 1', level: 'local', factor: 1.03, variance: 0.06 },
-  { id: 'park-2', name: 'Theme Park 2', level: 'local', factor: 0.97, variance: 0.055 },
-  { id: 'park-3', name: 'Theme Park 3', level: 'local', factor: 1.01, variance: 0.05 }
+  { id: 'region-1', name: 'Region 1 - UK Core', level: 'regional', parentId: 'global-hq', factor: 1.02, variance: 0.035 },
+  { id: 'region-2', name: 'Region 2 - EU West', level: 'regional', parentId: 'global-hq', factor: 0.98, variance: 0.04 },
+  { id: 'region-3', name: 'Region 3 - Gateway Markets', level: 'regional', parentId: 'global-hq', factor: 1.01, variance: 0.03 },
+  { id: 'park-r1-1', name: 'Alton Towers', level: 'local', parentId: 'region-1', factor: 1.04, variance: 0.06 },
+  { id: 'park-r1-2', name: 'Thorpe Park', level: 'local', parentId: 'region-1', factor: 0.99, variance: 0.055 },
+  { id: 'park-r2-1', name: 'Gardaland', level: 'local', parentId: 'region-2', factor: 1.01, variance: 0.058 },
+  { id: 'park-r2-2', name: 'Heide Park', level: 'local', parentId: 'region-2', factor: 0.96, variance: 0.052 },
+  { id: 'park-r3-1', name: 'LEGOLAND Windsor', level: 'local', parentId: 'region-3', factor: 1.05, variance: 0.06 },
+  { id: 'park-r3-2', name: 'Chessington World of Adventures', level: 'local', parentId: 'region-3', factor: 0.97, variance: 0.057 }
 ];
+
+const CONTRIBUTION_DATA = {
+  corporate: [
+    { id: 'region-1', revenueShare: 36, ebitdaShare: 38, guestsShare: 34, roiLift: 1.4 },
+    { id: 'region-2', revenueShare: 31, ebitdaShare: 29, guestsShare: 33, roiLift: 0.9 },
+    { id: 'region-3', revenueShare: 33, ebitdaShare: 33, guestsShare: 33, roiLift: 1.1 }
+  ],
+  regional: {
+    'region-1': [
+      { id: 'park-r1-1', revenueShare: 57, ebitdaShare: 58, guestsShare: 54, pricingMixLift: 2.2 },
+      { id: 'park-r1-2', revenueShare: 43, ebitdaShare: 42, guestsShare: 46, pricingMixLift: 1.6 }
+    ],
+    'region-2': [
+      { id: 'park-r2-1', revenueShare: 53, ebitdaShare: 51, guestsShare: 55, pricingMixLift: 1.8 },
+      { id: 'park-r2-2', revenueShare: 47, ebitdaShare: 49, guestsShare: 45, pricingMixLift: 1.3 }
+    ],
+    'region-3': [
+      { id: 'park-r3-1', revenueShare: 55, ebitdaShare: 56, guestsShare: 53, pricingMixLift: 2.0 },
+      { id: 'park-r3-2', revenueShare: 45, ebitdaShare: 44, guestsShare: 47, pricingMixLift: 1.5 }
+    ]
+  }
+};
 
 // ---- KPI Library ----
 const KPI_LIBRARY = [];
@@ -165,12 +190,18 @@ let currentFilter = 'all';
 
 // ---- DOM refs ----
 const $tableBody = document.getElementById('tableBody');
+const $primaryTabs = document.getElementById('primaryTabs');
+const $contextTabs = document.getElementById('contextTabs');
+const $scopePath = document.getElementById('scopePath');
 const $scoreVal = document.getElementById('scoreVal');
 const $countOn = document.getElementById('countOn');
 const $countRisk = document.getElementById('countRisk');
 const $countOff = document.getElementById('countOff');
 const $countT = document.getElementById('countTotal');
 const $scanProgress = document.getElementById('scanProgress');
+const $hierarchyTitle = document.getElementById('hierarchyTitle');
+const $hierarchySubtitle = document.getElementById('hierarchySubtitle');
+const $hierarchyGrid = document.getElementById('hierarchyGrid');
 
 // ---- Helpers ----
 function hashString(value) {
@@ -301,8 +332,89 @@ function statusNote(status, kpi) {
   return kpi.direction === 'higher' ? 'Below watch band.' : 'Above watch band.';
 }
 
+function getEntityById(entityId) {
+  return ENTITIES.find(entity => entity.id === entityId) || null;
+}
+
 function getCurrentEntity() {
-  return ENTITIES.find(entity => entity.id === currentEntityId);
+  return getEntityById(currentEntityId);
+}
+
+function getRegions() {
+  return ENTITIES.filter(entity => entity.level === 'regional');
+}
+
+function getParksByRegion(regionId) {
+  return ENTITIES.filter(entity => entity.level === 'local' && entity.parentId === regionId);
+}
+
+function getParentEntity(entity) {
+  if (!entity || !entity.parentId) return null;
+  return getEntityById(entity.parentId);
+}
+
+function getContributionRows(entity) {
+  if (!entity) return [];
+
+  if (entity.level === 'global') {
+    return CONTRIBUTION_DATA.corporate.map(row => ({
+      ...row,
+      entity: getEntityById(row.id),
+      label: 'Region to Corporate'
+    }));
+  }
+
+  if (entity.level === 'regional') {
+    const rows = CONTRIBUTION_DATA.regional[entity.id] || [];
+    return rows.map(row => ({
+      ...row,
+      entity: getEntityById(row.id),
+      label: 'Park to Region'
+    }));
+  }
+
+  const region = getParentEntity(entity);
+  if (!region) return [];
+  const regionRow = CONTRIBUTION_DATA.corporate.find(row => row.id === region.id);
+  const parkRows = CONTRIBUTION_DATA.regional[region.id] || [];
+  const parkRow = parkRows.find(row => row.id === entity.id);
+  if (!regionRow || !parkRow) return [];
+
+  return [
+    {
+      id: entity.id,
+      entity,
+      label: 'Park to Region',
+      revenueShare: parkRow.revenueShare,
+      ebitdaShare: parkRow.ebitdaShare,
+      guestsShare: parkRow.guestsShare,
+      pricingMixLift: parkRow.pricingMixLift
+    },
+    {
+      id: region.id,
+      entity: region,
+      label: 'Region to Corporate',
+      revenueShare: regionRow.revenueShare,
+      ebitdaShare: regionRow.ebitdaShare,
+      guestsShare: regionRow.guestsShare,
+      roiLift: regionRow.roiLift
+    }
+  ];
+}
+
+function getEffectiveRegionalParent(entity) {
+  if (!entity) return null;
+  if (entity.level === 'regional') return entity;
+  if (entity.level === 'local') return getParentEntity(entity);
+  return null;
+}
+
+function getScopePath(entity) {
+  if (!entity) return '';
+  if (entity.level === 'global') return entity.name;
+  const parent = getParentEntity(entity);
+  if (!parent) return entity.name;
+  return `Corporate HQ > ${parent.name}${entity.level === 'local' ? ` > ${entity.name}` : ''}`;
 }
 
 function getEntityKpis(entity) {
@@ -343,6 +455,91 @@ function updateDashboard() {
   } else {
     $scoreVal.style.color = 'var(--red)';
   }
+}
+
+function renderScope() {
+  const entity = getCurrentEntity();
+  if (!entity) return;
+
+  const primaryActiveId = entity.level === 'local' ? entity.parentId : entity.id;
+  document.querySelectorAll('#primaryTabs .school-tab').forEach(tab => {
+    tab.classList.toggle('active', tab.getAttribute('data-entity') === primaryActiveId);
+  });
+
+  let contextLabel = '';
+  let contextEntities = [];
+
+  if (entity.level === 'global') {
+    contextLabel = 'Regions';
+    contextEntities = getRegions();
+  } else {
+    const region = getEffectiveRegionalParent(entity);
+    if (region) {
+      contextLabel = `Theme Parks in ${region.name}`;
+      contextEntities = getParksByRegion(region.id);
+    }
+  }
+
+  const contextHtml = contextEntities.map(item => {
+    const active = item.id === entity.id ? 'active' : '';
+    return `
+      <button class="school-tab context-tab ${active}" data-entity="${item.id}">
+        <div class="school-dot ${item.level === 'local' ? 'local' : 'regional'}"></div>
+        ${item.name}
+      </button>
+    `;
+  }).join('');
+
+  $contextTabs.innerHTML = `
+    <div class="context-label">${contextLabel}</div>
+    <div class="context-list">${contextHtml}</div>
+  `;
+
+  $scopePath.textContent = getScopePath(entity);
+}
+
+function renderHierarchy() {
+  const entity = getCurrentEntity();
+  if (!entity) return;
+
+  const rows = getContributionRows(entity);
+  const region = getEffectiveRegionalParent(entity);
+
+  if (entity.level === 'global') {
+    $hierarchyTitle.textContent = 'Region Contribution to Corporate HQ';
+    $hierarchySubtitle.textContent = 'Regional shares rolling into group-level revenue, EBITDA, and guest volume.';
+  } else if (entity.level === 'regional') {
+    $hierarchyTitle.textContent = `${entity.name}: Theme Park Contribution`;
+    $hierarchySubtitle.textContent = 'Theme parks rolling into regional revenue mix and margin outcomes.';
+  } else {
+    $hierarchyTitle.textContent = `${entity.name}: Linked Contribution Chain`;
+    $hierarchySubtitle.textContent = `${entity.name} -> ${region ? region.name : 'Region'} -> Corporate HQ`;
+  }
+
+  if (!rows.length) {
+    $hierarchyGrid.innerHTML = '<div class="flow-empty">No contribution data available for this scope.</div>';
+    return;
+  }
+
+  $hierarchyGrid.innerHTML = rows.map(row => {
+    const liftLabel = row.label === 'Region to Corporate'
+      ? `ROI Lift: +${row.roiLift.toFixed(1)} pts`
+      : `Pricing Mix Lift: +${row.pricingMixLift.toFixed(1)} pts`;
+    return `
+      <div class="flow-card">
+        <div class="flow-top">
+          <div class="flow-unit">${row.entity ? row.entity.name : row.id}</div>
+          <div class="flow-tag">${row.label}</div>
+        </div>
+        <div class="flow-metrics">
+          <div class="flow-metric">Revenue Share <strong>${row.revenueShare}%</strong></div>
+          <div class="flow-metric">EBITDA Share <strong>${row.ebitdaShare}%</strong></div>
+          <div class="flow-metric">Guest Share <strong>${row.guestsShare}%</strong></div>
+        </div>
+        <div class="flow-lift">${liftLabel}</div>
+      </div>
+    `;
+  }).join('');
 }
 
 // ---- Render Table ----
@@ -615,6 +812,10 @@ function openLogic() {
         <div class="detail-box-body">Park improves cross-sell => regional revenue improves. Region improves pricing mix => corporate margin improves. Corporate allocates capex wisely => regions improve ROI.</div>
       </div>
       <div class="detail-box">
+        <div class="detail-box-title">Hierarchy Navigation</div>
+        <div class="detail-box-body">Corporate HQ is the default scope and exposes regions. Selecting a region exposes only theme parks mapped to that region. Contribution cards quantify how each child rolls up to its parent.</div>
+      </div>
+      <div class="detail-box">
         <div class="detail-box-title">Threshold Rules</div>
         <div class="detail-box-body">On Target = meeting target. At Risk = within watch band. Off Target = outside watch band. Targets are tuned by KPI direction (higher or lower is better).</div>
       </div>
@@ -637,25 +838,33 @@ function closeModal(id) {
 
 // ---- Entity Switching ----
 function selectEntity(entityId) {
+  const entity = getEntityById(entityId);
+  if (!entity) return;
   currentEntityId = entityId;
 
-  document.querySelectorAll('.school-tab').forEach(tab => {
-    tab.classList.toggle('active', tab.getAttribute('data-entity') === entityId);
-  });
-
+  renderScope();
+  renderHierarchy();
   updateDashboard();
   renderTable();
 }
 
 // ---- Boot ----
 (function init() {
+  renderScope();
+  renderHierarchy();
   updateDashboard();
   renderTable();
 })();
 
 // ---- EVENT BINDINGS ----
 
-document.getElementById('schoolTabs').addEventListener('click', (e) => {
+document.getElementById('primaryTabs').addEventListener('click', (e) => {
+  const tab = e.target.closest('.school-tab');
+  if (!tab) return;
+  selectEntity(tab.getAttribute('data-entity'));
+});
+
+document.getElementById('contextTabs').addEventListener('click', (e) => {
   const tab = e.target.closest('.school-tab');
   if (!tab) return;
   selectEntity(tab.getAttribute('data-entity'));
@@ -666,18 +875,12 @@ document.getElementById('filterBar').addEventListener('click', (e) => {
   if (!chip) return;
 
   const filter = chip.getAttribute('data-filter');
-  const scope = chip.getAttribute('data-scope');
 
   if (filter) {
     currentFilter = filter;
     document.querySelectorAll('.filter-chip[data-filter]').forEach(c => c.classList.remove('active-filter'));
     chip.classList.add('active-filter');
     renderTable();
-  }
-
-  if (scope) {
-    const entity = ENTITIES.find(item => item.level === scope);
-    if (entity) selectEntity(entity.id);
   }
 });
 

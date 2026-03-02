@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Merlin KPI Compass - Performance Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-badge">M</div>
+      <div>
+        <div class="header-title">Merlin KPI Compass</div>
+        <div class="header-subtitle">ENTERTAINMENTS PERFORMANCE</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-outline" id="btnDictionary">KPI Dictionary</button>
+      <button class="btn btn-outline" id="btnLogic">Cascading Logic</button>
+    </div>
+  </div>
+
+  <!-- ENTITY SELECTOR -->
+  <div class="school-bar">
+    <span class="school-label">Scope -&gt;</span>
+    <div class="school-tabs" id="schoolTabs">
+      <button class="school-tab active" data-entity="global-hq">
+        <div class="school-dot global"></div>
+        Corporate HQ
+      </button>
+      <button class="school-tab" data-entity="region-1">
+        <div class="school-dot regional"></div>
+        Region 1
+      </button>
+      <button class="school-tab" data-entity="region-2">
+        <div class="school-dot regional"></div>
+        Region 2
+      </button>
+      <button class="school-tab" data-entity="region-3">
+        <div class="school-dot regional"></div>
+        Region 3
+      </button>
+      <button class="school-tab" data-entity="park-1">
+        <div class="school-dot local"></div>
+        Theme Park 1
+      </button>
+      <button class="school-tab" data-entity="park-2">
+        <div class="school-dot local"></div>
+        Theme Park 2
+      </button>
+      <button class="school-tab" data-entity="park-3">
+        <div class="school-dot local"></div>
+        Theme Park 3
+      </button>
+    </div>
+  </div>
+
+  <!-- SUMMARY STRIP -->
+  <div class="summary-strip">
+    <div class="stat-card">
+      <div style="display: flex; flex-direction: column; justify-content: center; height: 100%; gap: 6px;">
+        <div class="stat-label">KPI HEALTH SCORE</div>
+        <div class="score-val" id="scoreVal" style="font-size: 32px;">--</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon blue">ALL</div>
+      <div>
+        <div class="stat-num" id="countTotal">--</div>
+        <div class="stat-label">Total KPIs</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">ON</div>
+      <div>
+        <div class="stat-num" id="countOn">--</div>
+        <div class="stat-label">On Target</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon amber">RISK</div>
+      <div>
+        <div class="stat-num" id="countRisk">--</div>
+        <div class="stat-label">At Risk</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon red">OFF</div>
+      <div>
+        <div class="stat-num" id="countOff">--</div>
+        <div class="stat-label">Off Target</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar" id="filterBar">
+    <button class="filter-chip active-filter" data-filter="all">All</button>
+    <button class="filter-chip" data-filter="on-track">On Target</button>
+    <button class="filter-chip" data-filter="at-risk">At Risk</button>
+    <button class="filter-chip" data-filter="off-track">Off Target</button>
+    <div class="filter-sep"></div>
+    <button class="filter-chip" data-scope="global">Global</button>
+    <button class="filter-chip" data-scope="regional">Regional</button>
+    <button class="filter-chip" data-scope="local">Local</button>
+  </div>
+
+  <!-- MAIN TABLE -->
+  <div class="main">
+    <div class="table-wrap">
+      <div class="scan-progress" id="scanProgress"></div>
+      <div id="tableBody">
+        <div class="loading-state">
+          <div class="loading-spinner"></div>
+          <div>Loading KPI data...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI DICTIONARY MODAL -->
+  <div class="modal-overlay" id="dictionaryModal">
+    <div class="modal" style="max-width:900px">
+      <div class="modal-header">
+        <div class="modal-title">KPI Dictionary</div>
+        <button class="modal-close" data-close="dictionaryModal">&times;</button>
+      </div>
+      <div class="modal-body" id="dictionaryBody"></div>
+    </div>
+  </div>
+
+  <!-- CASCADING LOGIC MODAL -->
+  <div class="modal-overlay" id="logicModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Cascading Logic</div>
+        <button class="modal-close" data-close="logicModal">&times;</button>
+      </div>
+      <div class="modal-body" id="logicBody"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>

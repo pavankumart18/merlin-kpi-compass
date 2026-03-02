@@ -1,0 +1,14 @@
+{
+  "name": "merlin-kpi-dashboard",
+  "version": "1.0.0",
+  "description": "Merlin Entertainments KPI performance dashboard",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": ["kpi", "dashboard", "merlin"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {}
+}
